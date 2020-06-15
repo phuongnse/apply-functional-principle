@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyFunctional.Logic", "ApplyFunctional.Logic\ApplyFunctional.Logic.csproj", "{75773B34-87A3-4894-9C0C-3BC1F8761AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplyFunctional.Logic", "ApplyFunctional.Logic\ApplyFunctional.Logic.csproj", "{75773B34-87A3-4894-9C0C-3BC1F8761AD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyFunctional.Api", "ApplyFunctional.Api\ApplyFunctional.Api.csproj", "{40F58312-BA2F-45AB-9F4C-73FC2EB4440D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{75773B34-87A3-4894-9C0C-3BC1F8761AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75773B34-87A3-4894-9C0C-3BC1F8761AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75773B34-87A3-4894-9C0C-3BC1F8761AD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40F58312-BA2F-45AB-9F4C-73FC2EB4440D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40F58312-BA2F-45AB-9F4C-73FC2EB4440D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40F58312-BA2F-45AB-9F4C-73FC2EB4440D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40F58312-BA2F-45AB-9F4C-73FC2EB4440D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
