@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplyFunctionalPrinciple.Logic", "ApplyFunctionalPrinciple.Logic\ApplyFunctionalPrinciple.Logic.csproj", "{17A4E249-ED02-4E78-9C28-033327BAEB98}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplyFunctionalPrinciple.Api", "ApplyFunctionalPrinciple.Api\ApplyFunctionalPrinciple.Api.csproj", "{CD5E83C3-43E3-4950-AF64-B4A873A522A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17A4E249-ED02-4E78-9C28-033327BAEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17A4E249-ED02-4E78-9C28-033327BAEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17A4E249-ED02-4E78-9C28-033327BAEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17A4E249-ED02-4E78-9C28-033327BAEB98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD5E83C3-43E3-4950-AF64-B4A873A522A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD5E83C3-43E3-4950-AF64-B4A873A522A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD5E83C3-43E3-4950-AF64-B4A873A522A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD5E83C3-43E3-4950-AF64-B4A873A522A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6213895-8B27-405D-BB41-1044A1135ED4}
+	EndGlobalSection
+EndGlobal
