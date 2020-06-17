@@ -68,9 +68,10 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
                 return "Customer name should not be empty";
-            if (name.Length > 200)
-                return "Customer name is too long";
-            return string.Empty;
+
+            return name.Length > 200 ? 
+                "Customer name is too long" : 
+                string.Empty;
         }
 
         [HttpPut]
@@ -108,10 +109,10 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         public IActionResult Get(long id)
         {
             var customer = _customerRepository.GetById(id);
-            if (customer == null)
-                return Error("Customer with such Id is not found: " + id);
 
-            return Ok(customer);
+            return customer == null ? 
+                Error("Customer with such Id is not found: " + id) : 
+                Ok(customer);
         }
 
         [HttpPost]
@@ -127,10 +128,9 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
 
             customer.Promote();
 
-            if (!_emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status))
-                return Error("Unable to send a notification email");
-
-            return Ok();
+            return !_emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status) ? 
+                Error("Unable to send a notification email") : 
+                Ok();
         }
     }
 }

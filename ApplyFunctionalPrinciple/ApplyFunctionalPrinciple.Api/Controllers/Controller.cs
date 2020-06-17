@@ -22,14 +22,14 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         {
             _unitOfWork.Commit();
 
-            return Ok(Envelope.Ok());
+            return base.Ok(Envelope.Ok());
         }
 
         protected IActionResult Ok<T>(T result)
         {
             _unitOfWork.Commit();
 
-            return Ok(Envelope.Ok(result));
+            return base.Ok(Envelope.Ok(result));
         }
     }
 }
