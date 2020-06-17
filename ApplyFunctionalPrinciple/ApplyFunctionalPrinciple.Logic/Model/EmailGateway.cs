@@ -4,17 +4,25 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public class EmailGateway : IEmailGateway
     {
-        public void SendPromotionNotification(string email, CustomerStatus newStatus)
+        public bool SendPromotionNotification(string email, CustomerStatus newStatus)
         {
-            SendEmail(email, "Congratulations!", "You've been promoted to " + newStatus);
-        }
+            var message = new MailMessage(
+                "noreply@northwind.com", 
+                email, 
+                "Congratulations!", 
+                "You've been promoted to " + newStatus);
 
-        private static void SendEmail(string to, string subject, string body)
-        {
-            var message = new MailMessage("noreply@northwind.com", to, subject, body);
-            var client = new SmtpClient();
+            using var client = new SmtpClient();
 
-            client.Send(message);
+            try
+            {
+                client.Send(message);
+                return true;
+            }
+            catch (SmtpException)
+            {
+                return false;
+            }
         }
     }
 }

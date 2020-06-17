@@ -111,7 +111,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (customer == null)
                 return Error("Customer with such Id is not found: " + id);
 
-            return Ok();
+            return Ok(customer);
         }
 
         [HttpPost]
@@ -127,7 +127,8 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
 
             customer.Promote();
 
-            _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status);
+            if (!_emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status))
+                return Error("Unable to send a notification email");
 
             return Ok();
         }
