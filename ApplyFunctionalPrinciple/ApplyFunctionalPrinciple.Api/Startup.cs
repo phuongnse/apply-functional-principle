@@ -1,8 +1,8 @@
+using ApplyFunctionalPrinciple.Api.Middlewares;
 using ApplyFunctionalPrinciple.Logic.Model;
 using ApplyFunctionalPrinciple.Logic.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -25,6 +25,8 @@ namespace ApplyFunctionalPrinciple.Api
         {
             if (webHostEnvironment.IsDevelopment())
                 applicationBuilder.UseDeveloperExceptionPage();
+
+            applicationBuilder.UseMiddleware<ExceptionHandlerMiddleware>();
 
             applicationBuilder.UseRouting();
 
