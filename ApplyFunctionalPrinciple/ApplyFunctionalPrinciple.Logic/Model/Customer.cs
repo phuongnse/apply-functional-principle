@@ -14,8 +14,8 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _primaryEmail = primaryEmail ?? throw new ArgumentNullException(nameof(primaryEmail));
             _secondaryEmail = secondaryEmail;
-            Industry = industry ?? throw new ArgumentNullException(nameof(industry));
-            EmailCampaign = GetEmailCampaign(industry);
+
+            EmailSetting = new EmailSetting(industry, false);
             Status = CustomerStatus.Regular;
         }
 
@@ -28,32 +28,17 @@ namespace ApplyFunctionalPrinciple.Logic.Model
         private readonly string _secondaryEmail;
         public virtual Email SecondaryEmail => (Email) _secondaryEmail;
 
-        public virtual Industry Industry { get; protected set; }
-        public virtual EmailCampaign EmailCampaign { get; protected set; }
+        public virtual EmailSetting EmailSetting { get; protected set; }
         public virtual CustomerStatus Status { get; protected set; }
-
-        private static EmailCampaign GetEmailCampaign(Industry industry)
-        {
-            return industry.Name switch
-            {
-                Industry.CarsIndustry => EmailCampaign.LatestCarModels,
-                Industry.PharmacyIndustry => EmailCampaign.PharmacyNews,
-                _ => EmailCampaign.Generic
-            };
-        }
 
         public virtual void DisableEmailing()
         {
-            EmailCampaign = EmailCampaign.None;
+            EmailSetting = EmailSetting.DisableEmailing();
         }
 
         public virtual void UpdateIndustry(Industry industry)
         {
-            if (EmailCampaign == EmailCampaign.None)
-                return;
-
-            EmailCampaign = GetEmailCampaign(industry);
-            Industry = industry;
+            EmailSetting = EmailSetting.ChangeIndustry(industry);
         }
 
         public virtual bool CanBePromoted()
@@ -63,7 +48,15 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 
         public virtual void Promote()
         {
-            Status = Status == CustomerStatus.Regular ? CustomerStatus.Preferred : CustomerStatus.Gold;
+            if (!CanBePromoted())
+                throw new InvalidOperationException();
+
+            Status = Status switch
+            {
+                CustomerStatus.Regular => CustomerStatus.Preferred,
+                CustomerStatus.Preferred => CustomerStatus.Gold,
+                _ => throw new InvalidOperationException()
+            };
         }
     }
 }

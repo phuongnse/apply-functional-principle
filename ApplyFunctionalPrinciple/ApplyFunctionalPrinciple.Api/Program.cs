@@ -1,8 +1,8 @@
-using System.IO;
 using ApplyFunctionalPrinciple.Logic.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace ApplyFunctionalPrinciple.Api
 {
@@ -15,7 +15,7 @@ namespace ApplyFunctionalPrinciple.Api
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            SessionFactory.Init(configurationRoot.GetConnectionString("DefaultConnectionString"));
+            Initer.Init(configurationRoot.GetConnectionString("DefaultConnectionString"));
 
             Host
                 .CreateDefaultBuilder(args)

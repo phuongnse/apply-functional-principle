@@ -105,8 +105,8 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                 Name = customer.Name,
                 PrimaryEmail = customer.PrimaryEmail,
                 SecondaryEmail = customer.SecondaryEmail,
-                Industry = customer.Industry.Name,
-                EmailCampaign = customer.EmailCampaign,
+                Industry = customer.EmailSetting.Industry.Name,
+                EmailCampaign = customer.EmailSetting.EmailCampaign,
                 Status = customer.Status
             };
 

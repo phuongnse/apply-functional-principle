@@ -1,4 +1,5 @@
 ﻿using FluentNHibernate.Mapping;
+using NHibernate.Type;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
@@ -21,10 +22,16 @@ namespace ApplyFunctionalPrinciple.Logic.Model
                 .Access.CamelCaseField(Prefix.Underscore)
                 .Nullable();
 
-            Map(customer => customer.EmailCampaign).CustomType<EmailCampaign>();
             Map(customer => customer.Status).CustomType<CustomerStatus>();
 
-            References(customer => customer.Industry);
+            Component(
+                customer => customer.EmailSetting, 
+                componentPart =>
+                {
+                    componentPart.Map(emailSetting => emailSetting.EmailingIsDisabled);
+
+                    componentPart.References(emailSetting => emailSetting.Industry);
+                });
         }
     }
 }
