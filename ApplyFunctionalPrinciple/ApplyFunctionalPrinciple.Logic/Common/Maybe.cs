@@ -1,10 +1,11 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 
 namespace ApplyFunctionalPrinciple.Logic.Common
 {
     public struct Maybe<T> : IEquatable<Maybe<T>> where T : class
     {
-        private Maybe(T value)
+        private Maybe([AllowNull] T value)
         {
             _value = value;
         }
@@ -24,7 +25,7 @@ namespace ApplyFunctionalPrinciple.Logic.Common
         public bool HasValue => _value != null;
         public bool HasNoValue => !HasValue;
 
-        public static implicit operator Maybe<T>(T value)
+        public static implicit operator Maybe<T>([AllowNull] T value)
         {
             return new Maybe<T>(value);
         }
@@ -84,12 +85,22 @@ namespace ApplyFunctionalPrinciple.Logic.Common
             return _value.ToString();
         }
 
-        public T Unwrap(T defaultValue = default)
+        [return: AllowNull]
+        public T Unwrap()
         {
             if (HasValue)
                 return _value;
 
-            return defaultValue;
+            return default;
+        }
+
+        [return: AllowNull]
+        public K Unwrap<K>(Func<T, K> selector)
+        {
+            if (HasValue)
+                return selector(_value);
+
+            return default;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
         {
         }
 
-        public Industry GetByName(string name)
+        public Maybe<Industry> GetByName(string name)
         {
             return UnitOfWork
                 .Query<Industry>()

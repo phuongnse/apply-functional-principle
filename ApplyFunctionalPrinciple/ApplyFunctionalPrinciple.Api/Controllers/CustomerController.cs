@@ -40,9 +40,9 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                     return Error(secondaryEmailResult.Error);
             }
 
-            var industry = _industryRepository.GetByName(createCustomerModel.Industry);
+            var maybeIndustry = _industryRepository.GetByName(createCustomerModel.Industry);
 
-            if (industry == null)
+            if (maybeIndustry.HasNoValue)
                 return Error("Industry name is invalid: " + createCustomerModel.Industry);
 
             var customer = new Customer(
@@ -50,7 +50,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                 primaryEmailResult.Value,
                 // this is small hack because we can not use result inside secondary email check
                 createCustomerModel.SecondaryEmail == null ? null : (Email) createCustomerModel.SecondaryEmail,
-                industry);
+                maybeIndustry.Value);
 
             _customerRepository.Save(customer);
 
@@ -61,17 +61,17 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}")]
         public IActionResult Update(UpdateCustomerModel model)
         {
-            var customer = _customerRepository.GetById(model.Id);
+            var maybeCustomer = _customerRepository.GetById(model.Id);
 
-            if (customer == null)
+            if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + model.Id);
 
-            var industry = _industryRepository.GetByName(model.Industry);
+            var maybeIndustry = _industryRepository.GetByName(model.Industry);
 
-            if (industry == null)
+            if (maybeIndustry.HasNoValue)
                 return Error("Industry name is invalid: " + model.Industry);
 
-            customer.UpdateIndustry(industry);
+            maybeCustomer.Value.UpdateIndustry(maybeIndustry.Value);
 
             return Ok();
         }
@@ -80,12 +80,12 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}/emailing")]
         public IActionResult DisableEmailing(long id)
         {
-            var customer = _customerRepository.GetById(id);
+            var maybeCustomer = _customerRepository.GetById(id);
 
-            if (customer == null)
+            if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
-            customer.DisableEmailing();
+            maybeCustomer.Value.DisableEmailing();
 
             return Ok();
         }
@@ -94,20 +94,23 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}")]
         public IActionResult Get(long id)
         {
-            var customer = _customerRepository.GetById(id);
+            var maybeCustomer = _customerRepository.GetById(id);
 
-            if (customer == null)
+            if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
             var customerDto = new CustomerDto
             {
-                Id = customer.Id,
-                Name = customer.Name,
-                PrimaryEmail = customer.PrimaryEmail,
-                SecondaryEmail = customer.SecondaryEmail,
-                Industry = customer.EmailSetting.Industry.Name,
-                EmailCampaign = customer.EmailSetting.EmailCampaign,
-                Status = customer.Status
+                Id = maybeCustomer.Value.Id,
+                Name = maybeCustomer.Value.Name,
+                PrimaryEmail = maybeCustomer.Value.PrimaryEmail,
+                SecondaryEmail = 
+                    maybeCustomer.Value.SecondaryEmail.HasValue 
+                        ? maybeCustomer.Value.SecondaryEmail.Value.Value 
+                        : null,
+                Industry = maybeCustomer.Value.EmailSetting.Industry.Name,
+                EmailCampaign = maybeCustomer.Value.EmailSetting.EmailCampaign,
+                Status = maybeCustomer.Value.Status
             };
 
             return Ok(customerDto);
@@ -117,17 +120,20 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}/promotion")]
         public IActionResult Promote(long id)
         {
-            var customer = _customerRepository.GetById(id);
+            var maybeCustomer = _customerRepository.GetById(id);
 
-            if (customer == null)
+            if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
-            if (!customer.CanBePromoted())
+            if (!maybeCustomer.Value.CanBePromoted())
                 return Error("The customer has the highest status possible");
 
-            customer.Promote();
+            maybeCustomer.Value.Promote();
 
-            var sendPromotionNotificationResult = _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status);
+            var sendPromotionNotificationResult = 
+                _emailGateway.SendPromotionNotification(
+                    maybeCustomer.Value.PrimaryEmail, 
+                    maybeCustomer.Value.Status);
 
             if (sendPromotionNotificationResult.IsFailure)
                 return Error(sendPromotionNotificationResult.Error);

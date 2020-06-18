@@ -11,7 +11,7 @@ namespace ApplyFunctionalPrinciple.Logic.Common
             UnitOfWork = unitOfWork;
         }
 
-        public TEntity GetById(long id)
+        public Maybe<TEntity> GetById(long id)
         {
             return UnitOfWork.Get<TEntity>(id);
         }

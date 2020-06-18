@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 
 namespace ApplyFunctionalPrinciple.Logic.Common
 {
@@ -6,7 +7,10 @@ namespace ApplyFunctionalPrinciple.Logic.Common
     {
         protected Result(bool isSuccess, string error)
         {
-            if (isSuccess && !string.IsNullOrEmpty(error) || string.IsNullOrEmpty(error) && !isSuccess)
+            if (isSuccess && !string.IsNullOrEmpty(error))
+                throw new InvalidOperationException();
+
+            if (string.IsNullOrEmpty(error) && !isSuccess)
                 throw new InvalidOperationException();
 
             IsSuccess = isSuccess;
@@ -42,7 +46,7 @@ namespace ApplyFunctionalPrinciple.Logic.Common
     {
         private readonly T _value;
 
-        protected internal Result(T value, bool isSuccess, string error) : base(isSuccess, error)
+        protected internal Result([AllowNull] T value, bool isSuccess, string error) : base(isSuccess, error)
         {
             _value = value;
         }

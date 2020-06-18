@@ -18,12 +18,12 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             yield return Value;
         }
 
-        public static Result<Email> Create(string email)
+        public static Result<Email> Create(Maybe<string> maybeEmail)
         {
-            if (email == null)
+            if (maybeEmail.HasNoValue)
                 return Result.Fail<Email>("Email should not be empty");
 
-            email = email.Trim();
+            var email = maybeEmail.Value.Trim();
 
             if (email == string.Empty)
                 return Result.Fail<Email>("Email should not be empty");

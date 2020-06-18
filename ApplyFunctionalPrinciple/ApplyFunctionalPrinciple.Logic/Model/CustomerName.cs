@@ -17,12 +17,12 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             yield return Value;
         }
 
-        public static Result<CustomerName> Create(string customerName)
+        public static Result<CustomerName> Create(Maybe<string> maybeCustomerName)
         {
-            if (customerName == null)
+            if (maybeCustomerName.HasNoValue)
                 return Result.Fail<CustomerName>("Customer name should not be empty");
 
-            customerName = customerName.Trim();
+            var customerName = maybeCustomerName.Value.Trim();
 
             if (customerName == string.Empty)
                 return Result.Fail<CustomerName>("Customer name should not be empty");

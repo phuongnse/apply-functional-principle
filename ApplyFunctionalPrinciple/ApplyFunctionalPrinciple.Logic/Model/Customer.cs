@@ -9,12 +9,11 @@ namespace ApplyFunctionalPrinciple.Logic.Model
         {
         }
 
-        public Customer(CustomerName name, Email primaryEmail, Email secondaryEmail, Industry industry)
+        public Customer(CustomerName name, Email primaryEmail, Maybe<Email> secondaryEmail, Industry industry)
         {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-            _primaryEmail = primaryEmail ?? throw new ArgumentNullException(nameof(primaryEmail));
-            _secondaryEmail = secondaryEmail;
-
+            _name = name;
+            _primaryEmail = primaryEmail;
+            SecondaryEmail = secondaryEmail;
             EmailSetting = new EmailSetting(industry, false);
             Status = CustomerStatus.Regular;
         }
@@ -25,8 +24,12 @@ namespace ApplyFunctionalPrinciple.Logic.Model
         private readonly string _primaryEmail;
         public virtual Email PrimaryEmail => (Email) _primaryEmail;
 
-        private readonly string _secondaryEmail;
-        public virtual Email SecondaryEmail => (Email) _secondaryEmail;
+        private string _secondaryEmail;
+        public virtual Maybe<Email> SecondaryEmail
+        {
+            get { return _secondaryEmail == null ? null : (Email) _secondaryEmail; }
+            protected set { _secondaryEmail = value.Unwrap(email => email.Value); }
+        }
 
         public virtual EmailSetting EmailSetting { get; protected set; }
         public virtual CustomerStatus Status { get; protected set; }
