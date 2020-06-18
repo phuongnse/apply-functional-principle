@@ -1,4 +1,5 @@
 ﻿using ApplyFunctionalPrinciple.Logic.Common;
+using System;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
@@ -8,19 +9,19 @@ namespace ApplyFunctionalPrinciple.Logic.Model
         {
         }
 
-        public Customer(string name, string primaryEmail, string secondaryEmail, Industry industry)
+        public Customer(CustomerName name, Email primaryEmail, Email secondaryEmail, Industry industry)
         {
-            Name = name;
-            PrimaryEmail = primaryEmail;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            PrimaryEmail = primaryEmail ?? throw new ArgumentNullException(nameof(primaryEmail));
             SecondaryEmail = secondaryEmail;
-            Industry = industry;
+            Industry = industry ?? throw new ArgumentNullException(nameof(industry));
             EmailCampaign = GetEmailCampaign(industry);
             Status = CustomerStatus.Regular;
         }
 
-        public virtual string Name { get; protected set; }
-        public virtual string PrimaryEmail { get; protected set; }
-        public virtual string SecondaryEmail { get; protected set; }
+        public virtual CustomerName Name { get; protected set; }
+        public virtual Email PrimaryEmail { get; protected set; }
+        public virtual Email SecondaryEmail { get; protected set; }
         public virtual Industry Industry { get; protected set; }
         public virtual EmailCampaign EmailCampaign { get; protected set; }
         public virtual CustomerStatus Status { get; protected set; }

@@ -23,19 +23,22 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers")]
         public IActionResult Create(CreateCustomerModel createCustomerModel)
         {
-            var nameError = ValidateName(createCustomerModel.Name);
-            if (!string.IsNullOrEmpty(nameError))
-                return Error(nameError);
+            var customerNameResult = CustomerName.Create(createCustomerModel.Name);
 
-            var primaryEmailError = ValidateEmail(createCustomerModel.PrimaryEmail, "Primary email");
-            if (!string.IsNullOrEmpty(primaryEmailError))
-                return Error(primaryEmailError);
+            if (customerNameResult.IsFailure)
+                return Error(customerNameResult.Error);
+
+            var primaryEmailResult = Email.Create(createCustomerModel.PrimaryEmail);
+            
+            if (primaryEmailResult.IsFailure)
+                return Error(primaryEmailResult.Error);
 
             if (createCustomerModel.SecondaryEmail != null)
             {
-                var secondaryEmailError = ValidateEmail(createCustomerModel.SecondaryEmail, "Secondary email");
-                if (!string.IsNullOrEmpty(secondaryEmailError))
-                    return Error(secondaryEmailError);
+                var secondaryEmailResult = Email.Create(createCustomerModel.SecondaryEmail);
+
+                if (secondaryEmailResult.IsFailure)
+                    return Error(secondaryEmailResult.Error);
             }
 
             var industry = _industryRepository.GetByName(createCustomerModel.Industry);
@@ -43,35 +46,15 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                 return Error("Industry name is invalid: " + createCustomerModel.Industry);
 
             var customer = new Customer(
-                createCustomerModel.Name, 
-                createCustomerModel.PrimaryEmail,
-                createCustomerModel.SecondaryEmail, 
+                customerNameResult.Value,
+                primaryEmailResult.Value,
+                // this is small hack because we can not use result inside secondary email check
+                createCustomerModel.SecondaryEmail == null ? null : (Email) createCustomerModel.SecondaryEmail,
                 industry);
 
             _customerRepository.Save(customer);
 
             return Ok();
-        }
-
-        private static string ValidateEmail(string email, string fieldName)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return fieldName + " should not be empty";
-            if (email.Length > 256)
-                return fieldName + " is too long";
-            if (!Regex.IsMatch(email, @"^(.+)@(.+)$"))
-                return fieldName + " is invalid";
-            return string.Empty;
-        }
-
-        private static string ValidateName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return "Customer name should not be empty";
-
-            return name.Length > 200 ? 
-                "Customer name is too long" : 
-                string.Empty;
         }
 
         [HttpPut]
