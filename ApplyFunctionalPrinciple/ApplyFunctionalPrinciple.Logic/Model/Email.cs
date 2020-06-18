@@ -1,17 +1,17 @@
-﻿using ApplyFunctionalPrinciple.Logic.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ApplyFunctionalPrinciple.Logic.Common;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class Email : ValueObject<Email>
     {
-        public string Value { get; }
-
         private Email(string value)
         {
             Value = value;
         }
+
+        public string Value { get; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
@@ -31,10 +31,9 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             if (email.Length > 256)
                 return Result.Fail<Email>("Email is too long");
 
-            if (!Regex.IsMatch(email, @"^(.+)@(.+)$"))
-                return Result.Fail<Email>("Email is invalid");
-
-            return Result.Ok(new Email(email));
+            return !Regex.IsMatch(email, @"^(.+)@(.+)$")
+                ? Result.Fail<Email>("Email is invalid")
+                : Result.Ok(new Email(email));
         }
 
         public static explicit operator Email(string email)

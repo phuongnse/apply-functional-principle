@@ -1,5 +1,4 @@
 ﻿using FluentNHibernate.Mapping;
-using NHibernate.Type;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
@@ -25,7 +24,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             Map(customer => customer.Status).CustomType<CustomerStatus>();
 
             Component(
-                customer => customer.EmailSetting, 
+                customer => customer.EmailSetting,
                 componentPart =>
                 {
                     componentPart.Map(emailSetting => emailSetting.EmailingIsDisabled);

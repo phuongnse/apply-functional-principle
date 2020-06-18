@@ -1,10 +1,16 @@
-﻿using ApplyFunctionalPrinciple.Logic.Common;
-using System;
+﻿using System;
+using ApplyFunctionalPrinciple.Logic.Common;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public class Customer : Entity
     {
+        private readonly string _name;
+
+        private readonly string _primaryEmail;
+
+        private string _secondaryEmail;
+
         protected Customer()
         {
         }
@@ -18,16 +24,12 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             Status = CustomerStatus.Regular;
         }
 
-        private readonly string _name;
         public virtual CustomerName Name => (CustomerName) _name;
-
-        private readonly string _primaryEmail;
         public virtual Email PrimaryEmail => (Email) _primaryEmail;
 
-        private string _secondaryEmail;
         public virtual Maybe<Email> SecondaryEmail
         {
-            get { return _secondaryEmail == null ? null : (Email) _secondaryEmail; }
+            get => _secondaryEmail == null ? null : (Email) _secondaryEmail;
             protected set { _secondaryEmail = value.Unwrap(email => email.Value); }
         }
 
@@ -58,6 +60,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             {
                 CustomerStatus.Regular => CustomerStatus.Preferred,
                 CustomerStatus.Preferred => CustomerStatus.Gold,
+                CustomerStatus.Gold => throw new InvalidOperationException(),
                 _ => throw new InvalidOperationException()
             };
         }

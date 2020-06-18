@@ -1,9 +1,9 @@
-﻿using NullGuard;
-using System;
+﻿using System;
+using NullGuard;
 
 namespace ApplyFunctionalPrinciple.Logic.Common
 {
-    public struct Maybe<T> : IEquatable<Maybe<T>> where T : class
+    public readonly struct Maybe<T> : IEquatable<Maybe<T>> where T : class
     {
         private Maybe([AllowNull] T value)
         {
@@ -11,6 +11,7 @@ namespace ApplyFunctionalPrinciple.Logic.Common
         }
 
         private readonly T _value;
+
         public T Value
         {
             get
@@ -32,10 +33,7 @@ namespace ApplyFunctionalPrinciple.Logic.Common
 
         public static bool operator ==(Maybe<T> left, T right)
         {
-            if (left.HasNoValue)
-                return false;
-
-            return left._value.Equals(right);
+            return !left.HasNoValue && left._value.Equals(right);
         }
 
         public static bool operator ==(Maybe<T> left, Maybe<T> right)
@@ -79,28 +77,19 @@ namespace ApplyFunctionalPrinciple.Logic.Common
 
         public override string ToString()
         {
-            if (HasNoValue)
-                return "No value";
-
-            return _value.ToString();
+            return HasNoValue ? "No value" : _value.ToString();
         }
 
         [return: AllowNull]
         public T Unwrap()
         {
-            if (HasValue)
-                return _value;
-
-            return default;
+            return HasValue ? _value : default;
         }
 
         [return: AllowNull]
-        public K Unwrap<K>(Func<T, K> selector)
+        public TK Unwrap<TK>(Func<T, TK> selector)
         {
-            if (HasValue)
-                return selector(_value);
-
-            return default;
+            return HasValue ? selector(_value) : default;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using ApplyFunctionalPrinciple.Logic.Common;
-using System.Net.Mail;
+﻿using System.Net.Mail;
+using ApplyFunctionalPrinciple.Logic.Common;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
@@ -7,7 +7,8 @@ namespace ApplyFunctionalPrinciple.Logic.Model
     {
         public Result SendPromotionNotification(string email, CustomerStatus newStatus)
         {
-            var message = new MailMessage("noreply@northwind.com", email, "Congratulations!", "You've been promoted to " + newStatus);
+            var message = new MailMessage("noreply@northwind.com", email, "Congratulations!",
+                "You've been promoted to " + newStatus);
 
             using var client = new SmtpClient();
 

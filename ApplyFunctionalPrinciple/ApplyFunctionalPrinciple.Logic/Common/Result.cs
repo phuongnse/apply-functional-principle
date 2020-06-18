@@ -1,5 +1,5 @@
-﻿using NullGuard;
-using System;
+﻿using System;
+using NullGuard;
 
 namespace ApplyFunctionalPrinciple.Logic.Common
 {

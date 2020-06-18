@@ -8,8 +8,8 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
     public class CustomerController : Controller
     {
         private readonly CustomerRepository _customerRepository;
-        private readonly IndustryRepository _industryRepository;
         private readonly IEmailGateway _emailGateway;
+        private readonly IndustryRepository _industryRepository;
 
         public CustomerController(UnitOfWork unitOfWork, IEmailGateway emailGateway) : base(unitOfWork)
         {
@@ -28,7 +28,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                 return Error(customerNameResult.Error);
 
             var primaryEmailResult = Email.Create(createCustomerModel.PrimaryEmail);
-            
+
             if (primaryEmailResult.IsFailure)
                 return Error(primaryEmailResult.Error);
 
@@ -45,12 +45,16 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeIndustry.HasNoValue)
                 return Error("Industry name is invalid: " + createCustomerModel.Industry);
 
+            var customerName = customerNameResult.Value;
+            var primaryEmail = primaryEmailResult.Value;
+            var industry = maybeIndustry.Value;
+
             var customer = new Customer(
-                customerNameResult.Value,
-                primaryEmailResult.Value,
+                customerName,
+                primaryEmail,
                 // this is small hack because we can not use result inside secondary email check
                 createCustomerModel.SecondaryEmail == null ? null : (Email) createCustomerModel.SecondaryEmail,
-                maybeIndustry.Value);
+                industry);
 
             _customerRepository.Save(customer);
 
@@ -71,7 +75,10 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeIndustry.HasNoValue)
                 return Error("Industry name is invalid: " + model.Industry);
 
-            maybeCustomer.Value.UpdateIndustry(maybeIndustry.Value);
+            var customer = maybeCustomer.Value;
+            var industry = maybeIndustry.Value;
+
+            customer.UpdateIndustry(industry);
 
             return Ok();
         }
@@ -85,7 +92,9 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
-            maybeCustomer.Value.DisableEmailing();
+            var customer = maybeCustomer.Value;
+
+            customer.DisableEmailing();
 
             return Ok();
         }
@@ -99,18 +108,17 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
+            var customer = maybeCustomer.Value;
+
             var customerDto = new CustomerDto
             {
-                Id = maybeCustomer.Value.Id,
-                Name = maybeCustomer.Value.Name,
-                PrimaryEmail = maybeCustomer.Value.PrimaryEmail,
-                SecondaryEmail = 
-                    maybeCustomer.Value.SecondaryEmail.HasValue 
-                        ? maybeCustomer.Value.SecondaryEmail.Value.Value 
-                        : null,
-                Industry = maybeCustomer.Value.EmailSetting.Industry.Name,
-                EmailCampaign = maybeCustomer.Value.EmailSetting.EmailCampaign,
-                Status = maybeCustomer.Value.Status
+                Id = customer.Id,
+                Name = customer.Name,
+                PrimaryEmail = customer.PrimaryEmail,
+                SecondaryEmail = customer.SecondaryEmail.HasValue ? customer.SecondaryEmail.Value.Value : null,
+                Industry = customer.EmailSetting.Industry.Name,
+                EmailCampaign = customer.EmailSetting.EmailCampaign,
+                Status = customer.Status
             };
 
             return Ok(customerDto);
@@ -125,20 +133,17 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + id);
 
-            if (!maybeCustomer.Value.CanBePromoted())
+            var customer = maybeCustomer.Value;
+
+            if (!customer.CanBePromoted())
                 return Error("The customer has the highest status possible");
 
-            maybeCustomer.Value.Promote();
+            customer.Promote();
 
-            var sendPromotionNotificationResult = 
-                _emailGateway.SendPromotionNotification(
-                    maybeCustomer.Value.PrimaryEmail, 
-                    maybeCustomer.Value.Status);
+            var sendPromotionNotificationResult =
+                _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status);
 
-            if (sendPromotionNotificationResult.IsFailure)
-                return Error(sendPromotionNotificationResult.Error);
-                
-            return Ok();
+            return sendPromotionNotificationResult.IsFailure ? Error(sendPromotionNotificationResult.Error) : Ok();
         }
     }
 }

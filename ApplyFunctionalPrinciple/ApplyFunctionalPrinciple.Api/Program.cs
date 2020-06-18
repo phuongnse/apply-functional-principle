@@ -1,8 +1,8 @@
+using System.IO;
 using ApplyFunctionalPrinciple.Logic.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System.IO;
 
 namespace ApplyFunctionalPrinciple.Api
 {

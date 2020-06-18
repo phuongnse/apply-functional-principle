@@ -1,6 +1,6 @@
-﻿using ApplyFunctionalPrinciple.Logic.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using ApplyFunctionalPrinciple.Logic.Common;
 using static ApplyFunctionalPrinciple.Logic.Model.EmailCampaign;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
@@ -38,16 +38,13 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             if (EmailingIsDisabled)
                 return None;
 
-            if (Industry.Name == Industry.CarsIndustry)
-                return LatestCarModels;
-
-            if (Industry.Name == Industry.PharmacyIndustry)
-                return PharmacyNews;
-
-            if (Industry.Name == Industry.OtherIndustry)
-                return Generic;
-
-            throw new ArgumentException();
+            return Industry.Name switch
+            {
+                Industry.CarsIndustry => LatestCarModels,
+                Industry.PharmacyIndustry => PharmacyNews,
+                Industry.OtherIndustry => Generic,
+                _ => throw new ArgumentException()
+            };
         }
     }
 }

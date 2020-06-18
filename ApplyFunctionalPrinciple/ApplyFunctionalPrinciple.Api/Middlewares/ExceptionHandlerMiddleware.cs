@@ -1,9 +1,9 @@
-﻿using ApplyFunctionalPrinciple.Api.Models;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ApplyFunctionalPrinciple.Api.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace ApplyFunctionalPrinciple.Api.Middlewares
 {
