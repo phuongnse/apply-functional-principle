@@ -1,7 +1,9 @@
-﻿namespace ApplyFunctionalPrinciple.Logic.Model
+﻿using ApplyFunctionalPrinciple.Logic.Common;
+
+namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public interface IEmailGateway
     {
-        bool SendPromotionNotification(string email, CustomerStatus newStatus);
+        Result SendPromotionNotification(string email, CustomerStatus newStatus);
     }
 }

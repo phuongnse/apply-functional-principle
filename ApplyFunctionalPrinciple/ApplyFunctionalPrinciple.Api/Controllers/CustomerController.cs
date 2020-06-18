@@ -2,7 +2,6 @@
 using ApplyFunctionalPrinciple.Logic.Model;
 using ApplyFunctionalPrinciple.Logic.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
 
 namespace ApplyFunctionalPrinciple.Api.Controllers
 {
@@ -42,6 +41,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             }
 
             var industry = _industryRepository.GetByName(createCustomerModel.Industry);
+
             if (industry == null)
                 return Error("Industry name is invalid: " + createCustomerModel.Industry);
 
@@ -62,10 +62,12 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         public IActionResult Update(UpdateCustomerModel model)
         {
             var customer = _customerRepository.GetById(model.Id);
+
             if (customer == null)
                 return Error("Customer with such Id is not found: " + model.Id);
 
             var industry = _industryRepository.GetByName(model.Industry);
+
             if (industry == null)
                 return Error("Industry name is invalid: " + model.Industry);
 
@@ -79,6 +81,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         public IActionResult DisableEmailing(long id)
         {
             var customer = _customerRepository.GetById(id);
+
             if (customer == null)
                 return Error("Customer with such Id is not found: " + id);
 
@@ -93,9 +96,21 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         {
             var customer = _customerRepository.GetById(id);
 
-            return customer == null ? 
-                Error("Customer with such Id is not found: " + id) : 
-                Ok(customer);
+            if (customer == null)
+                return Error("Customer with such Id is not found: " + id);
+
+            var customerDto = new CustomerDto
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                PrimaryEmail = customer.PrimaryEmail,
+                SecondaryEmail = customer.SecondaryEmail,
+                Industry = customer.Industry.Name,
+                EmailCampaign = customer.EmailCampaign,
+                Status = customer.Status
+            };
+
+            return Ok(customerDto);
         }
 
         [HttpPost]
@@ -103,6 +118,7 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         public IActionResult Promote(long id)
         {
             var customer = _customerRepository.GetById(id);
+
             if (customer == null)
                 return Error("Customer with such Id is not found: " + id);
 
@@ -111,9 +127,12 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
 
             customer.Promote();
 
-            return !_emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status) ? 
-                Error("Unable to send a notification email") : 
-                Ok();
+            var sendPromotionNotificationResult = _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status);
+
+            if (sendPromotionNotificationResult.IsFailure)
+                return Error(sendPromotionNotificationResult.Error);
+                
+            return Ok();
         }
     }
 }

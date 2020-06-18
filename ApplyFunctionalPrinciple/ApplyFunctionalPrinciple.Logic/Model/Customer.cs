@@ -11,17 +11,23 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 
         public Customer(CustomerName name, Email primaryEmail, Email secondaryEmail, Industry industry)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            PrimaryEmail = primaryEmail ?? throw new ArgumentNullException(nameof(primaryEmail));
-            SecondaryEmail = secondaryEmail;
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _primaryEmail = primaryEmail ?? throw new ArgumentNullException(nameof(primaryEmail));
+            _secondaryEmail = secondaryEmail;
             Industry = industry ?? throw new ArgumentNullException(nameof(industry));
             EmailCampaign = GetEmailCampaign(industry);
             Status = CustomerStatus.Regular;
         }
 
-        public virtual CustomerName Name { get; protected set; }
-        public virtual Email PrimaryEmail { get; protected set; }
-        public virtual Email SecondaryEmail { get; protected set; }
+        private readonly string _name;
+        public virtual CustomerName Name => (CustomerName) _name;
+
+        private readonly string _primaryEmail;
+        public virtual Email PrimaryEmail => (Email) _primaryEmail;
+
+        private readonly string _secondaryEmail;
+        public virtual Email SecondaryEmail => (Email) _secondaryEmail;
+
         public virtual Industry Industry { get; protected set; }
         public virtual EmailCampaign EmailCampaign { get; protected set; }
         public virtual CustomerStatus Status { get; protected set; }
