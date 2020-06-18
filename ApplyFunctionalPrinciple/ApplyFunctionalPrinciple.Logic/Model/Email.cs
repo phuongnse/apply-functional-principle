@@ -6,7 +6,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class Email : ValueObject<Email>
     {
-        private string Value { get; }
+        public string Value { get; }
 
         private Email(string value)
         {
@@ -18,7 +18,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             yield return Value;
         }
 
-        private static Result<Email> Create(string email)
+        public static Result<Email> Create(string email)
         {
             if (email == null)
                 return Result.Fail<Email>("Email should not be empty");

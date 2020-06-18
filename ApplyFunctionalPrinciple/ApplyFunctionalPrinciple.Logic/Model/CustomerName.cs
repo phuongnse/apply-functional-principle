@@ -5,7 +5,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class CustomerName : ValueObject<CustomerName>
     {
-        private string Value { get; }
+        public string Value { get; }
 
         private CustomerName(string value)
         {
@@ -17,7 +17,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             yield return Value;
         }
 
-        private static Result<CustomerName> Create(string customerName)
+        public static Result<CustomerName> Create(string customerName)
         {
             if (customerName == null)
                 return Result.Fail<CustomerName>("Customer name should not be empty");
