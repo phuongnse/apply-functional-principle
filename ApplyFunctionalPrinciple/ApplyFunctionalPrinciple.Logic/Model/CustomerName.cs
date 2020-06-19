@@ -5,6 +5,10 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class CustomerName : ValueObject<CustomerName>
     {
+        private CustomerName()
+        {
+        }
+
         private CustomerName(string value)
         {
             Value = value;

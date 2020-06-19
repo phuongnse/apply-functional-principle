@@ -77,25 +77,20 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}")]
         public IActionResult Get(long id)
         {
-            var maybeCustomer = _customerRepository.GetById(id);
-
-            if (maybeCustomer.HasNoValue)
-                return Error("Customer with such Id is not found: " + id);
-
-            var customer = maybeCustomer.Value;
-
-            var customerDto = new CustomerDto
-            {
-                Id = customer.Id,
-                Name = customer.Name,
-                PrimaryEmail = customer.PrimaryEmail,
-                SecondaryEmail = customer.SecondaryEmail.HasValue ? customer.SecondaryEmail.Value.Value : null,
-                Industry = customer.EmailSetting.Industry.Name,
-                EmailCampaign = customer.EmailSetting.EmailCampaign,
-                Status = customer.Status
-            };
-
-            return Ok(customerDto);
+            return _customerRepository
+                .GetById(id)
+                .ToResult("Customer with such Id is not found: " + id)
+                .OnSuccess(customer => new CustomerDto
+                {
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    PrimaryEmail = customer.PrimaryEmail,
+                    SecondaryEmail = customer.SecondaryEmail.HasValue ? customer.SecondaryEmail.Value.Value : null,
+                    Industry = customer.EmailSetting.Industry.Name,
+                    EmailCampaign = customer.EmailSetting.EmailCampaign,
+                    Status = customer.Status
+                })
+                .OnBoth(result => result.IsFailure ? Error(result.Error) : Ok(result.Value));
         }
 
         [HttpPost]

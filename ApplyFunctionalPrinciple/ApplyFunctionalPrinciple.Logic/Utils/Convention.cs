@@ -21,7 +21,7 @@ namespace ApplyFunctionalPrinciple.Logic.Utils
 
         public void Apply(IIdentityInstance instance)
         {
-            instance.Column(instance.EntityType.Name + "Id");
+            instance.Column("Id");
             instance.GeneratedBy.HiLo("Ids", "NextHigh", "9", "EntityName = '" + instance.EntityType.Name + "'");
         }
 

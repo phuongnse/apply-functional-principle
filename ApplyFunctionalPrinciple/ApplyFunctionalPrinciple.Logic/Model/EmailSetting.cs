@@ -8,6 +8,10 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class EmailSetting : ValueObject<EmailSetting>
     {
+        private EmailSetting()
+        {
+        }
+
         public EmailSetting(Industry industry, bool emailingIsDisabled)
         {
             Industry = industry;

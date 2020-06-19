@@ -46,7 +46,7 @@ namespace ApplyFunctionalPrinciple.Logic.Utils
             _isCommitted = true;
         }
 
-        internal TEntity Get<TEntity>(long id) where TEntity : Entity
+        internal Maybe<TEntity> Get<TEntity>(long id) where TEntity : Entity
         {
             return _session.Get<TEntity>(id);
         }

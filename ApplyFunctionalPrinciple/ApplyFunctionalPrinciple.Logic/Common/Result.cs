@@ -95,5 +95,10 @@ namespace ApplyFunctionalPrinciple.Logic.Common
 
             return !predicate(_value) ? Fail<T>(errorMessage) : this;
         }
+
+        public TK OnBoth<TK>(Func<Result<T>, TK> func)
+        {
+            return func(this);
+        }
     }
 }

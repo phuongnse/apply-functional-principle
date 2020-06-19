@@ -6,6 +6,10 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 {
     public sealed class Email : ValueObject<Email>
     {
+        private Email()
+        {
+        }
+
         private Email(string value)
         {
             Value = value;
