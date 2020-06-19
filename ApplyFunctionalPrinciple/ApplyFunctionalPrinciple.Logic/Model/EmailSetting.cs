@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ApplyFunctionalPrinciple.Logic.Common;
 using static ApplyFunctionalPrinciple.Logic.Model.EmailCampaign;
+using static ApplyFunctionalPrinciple.Logic.Model.Industry;
 
 namespace ApplyFunctionalPrinciple.Logic.Model
 {
@@ -30,7 +31,7 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 
         public EmailSetting ChangeIndustry(Industry industry)
         {
-            return new EmailSetting(industry, false);
+            return new EmailSetting(industry, EmailingIsDisabled);
         }
 
         private EmailCampaign GetEmailCampaign()
@@ -38,13 +39,16 @@ namespace ApplyFunctionalPrinciple.Logic.Model
             if (EmailingIsDisabled)
                 return None;
 
-            return Industry.Name switch
-            {
-                Industry.CarsIndustry => LatestCarModels,
-                Industry.PharmacyIndustry => PharmacyNews,
-                Industry.OtherIndustry => Generic,
-                _ => throw new ArgumentException()
-            };
+            if (Industry == Cars)
+                return LatestCarModels;
+
+            if (Industry == Pharmacy)
+                return PharmacyNews;
+
+            if (Industry == Other)
+                return Generic;
+
+            throw new InvalidOperationException();
         }
     }
 }

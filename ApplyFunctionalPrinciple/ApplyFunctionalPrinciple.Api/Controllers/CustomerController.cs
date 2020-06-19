@@ -9,12 +9,10 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
     {
         private readonly CustomerRepository _customerRepository;
         private readonly IEmailGateway _emailGateway;
-        private readonly IndustryRepository _industryRepository;
 
         public CustomerController(UnitOfWork unitOfWork, IEmailGateway emailGateway) : base(unitOfWork)
         {
             _customerRepository = new CustomerRepository(unitOfWork);
-            _industryRepository = new IndustryRepository(unitOfWork);
             _emailGateway = emailGateway;
         }
 
@@ -40,14 +38,14 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                     return Error(secondaryEmailResult.Error);
             }
 
-            var maybeIndustry = _industryRepository.GetByName(createCustomerModel.Industry);
+            var industryResult = Industry.Get(createCustomerModel.Industry);
 
-            if (maybeIndustry.HasNoValue)
-                return Error("Industry name is invalid: " + createCustomerModel.Industry);
+            if (industryResult.IsFailure)
+                return Error(industryResult.Error);
 
             var customerName = customerNameResult.Value;
             var primaryEmail = primaryEmailResult.Value;
-            var industry = maybeIndustry.Value;
+            var industry = industryResult.Value;
 
             var customer = new Customer(
                 customerName,
@@ -70,13 +68,13 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (maybeCustomer.HasNoValue)
                 return Error("Customer with such Id is not found: " + model.Id);
 
-            var maybeIndustry = _industryRepository.GetByName(model.Industry);
+            var industryResult = Industry.Get(model.Industry);
 
-            if (maybeIndustry.HasNoValue)
-                return Error("Industry name is invalid: " + model.Industry);
+            if (industryResult.IsFailure)
+                return Error(industryResult.Error);
 
             var customer = maybeCustomer.Value;
-            var industry = maybeIndustry.Value;
+            var industry = industryResult.Value;
 
             customer.UpdateIndustry(industry);
 
