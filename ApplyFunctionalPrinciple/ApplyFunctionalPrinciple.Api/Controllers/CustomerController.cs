@@ -50,25 +50,28 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
                 .ToResult("Customer with such Id is not found: " + model.Id);
 
             var industryResult = Industry.Get(model.Industry);
+            var result = Result.Combine(customerResult, industryResult);
 
-            return Result
-                .Combine(customerResult, industryResult)
-                .OnSuccess(() => customerResult.Value.UpdateIndustry(industryResult.Value))
-                .OnBoth(result => result.IsFailure ? Error(result.Error) : Ok());
+            if (result.IsFailure)
+                return Error(result.Error);
+
+            customerResult.Value.UpdateIndustry(industryResult.Value);
+
+            return Ok();
         }
 
         [HttpDelete]
         [Route("customers/{id}/emailing")]
         public IActionResult DisableEmailing(long id)
         {
-            var maybeCustomer = _customerRepository.GetById(id);
+            var customerResult = _customerRepository
+                .GetById(id)
+                .ToResult("Customer with such Id is not found: " + id);
 
-            if (maybeCustomer.HasNoValue)
-                return Error("Customer with such Id is not found: " + id);
+            if (customerResult.IsFailure)
+                return Error(customerResult.Error);
 
-            var customer = maybeCustomer.Value;
-
-            customer.DisableEmailing();
+            customerResult.Value.DisableEmailing();
 
             return Ok();
         }

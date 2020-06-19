@@ -49,19 +49,6 @@ namespace ApplyFunctionalPrinciple.Logic.Common
 
             return Ok();
         }
-
-        public T OnBoth<T>(Func<Result, T> func)
-        {
-            return func(this);
-        }
-
-        public Result OnSuccess(Action action)
-        {
-            if (IsSuccess)
-                action();
-
-            return this;
-        }
     }
 
     public class Result<T> : Result
