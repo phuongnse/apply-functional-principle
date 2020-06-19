@@ -91,5 +91,10 @@ namespace ApplyFunctionalPrinciple.Logic.Common
         {
             return HasValue ? selector(_value) : default;
         }
+
+        public Result<T> ToResult(string errorMessage)
+        {
+            return HasNoValue ? Result.Fail<T>(errorMessage) : Result.Ok(_value);
+        }
     }
 }

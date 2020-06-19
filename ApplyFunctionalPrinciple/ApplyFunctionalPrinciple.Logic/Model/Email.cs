@@ -20,20 +20,13 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 
         public static Result<Email> Create(Maybe<string> maybeEmail)
         {
-            if (maybeEmail.HasNoValue)
-                return Result.Fail<Email>("Email should not be empty");
-
-            var email = maybeEmail.Value.Trim();
-
-            if (email == string.Empty)
-                return Result.Fail<Email>("Email should not be empty");
-
-            if (email.Length > 256)
-                return Result.Fail<Email>("Email is too long");
-
-            return !Regex.IsMatch(email, @"^(.+)@(.+)$")
-                ? Result.Fail<Email>("Email is invalid")
-                : Result.Ok(new Email(email));
+            return maybeEmail
+                .ToResult("Email should not be empty")
+                .OnSuccess(email => email.Trim())
+                .Ensure(email => email != string.Empty, "Email should not be empty")
+                .Ensure(email => email.Length <= 256, "Email is too long")
+                .Ensure(email => Regex.IsMatch(email, @"^(.+)@(.+)$"), "Email is invalid")
+                .OnSuccess(email => new Email(email));
         }
 
         public static explicit operator Email(string email)

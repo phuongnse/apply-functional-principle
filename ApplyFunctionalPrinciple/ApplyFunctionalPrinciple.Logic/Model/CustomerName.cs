@@ -19,17 +19,12 @@ namespace ApplyFunctionalPrinciple.Logic.Model
 
         public static Result<CustomerName> Create(Maybe<string> maybeCustomerName)
         {
-            if (maybeCustomerName.HasNoValue)
-                return Result.Fail<CustomerName>("Customer name should not be empty");
-
-            var customerName = maybeCustomerName.Value.Trim();
-
-            if (customerName == string.Empty)
-                return Result.Fail<CustomerName>("Customer name should not be empty");
-
-            return customerName.Length > 200
-                ? Result.Fail<CustomerName>("Customer name is too long")
-                : Result.Ok(new CustomerName(customerName));
+            return maybeCustomerName
+                .ToResult("Customer name should not be empty")
+                .OnSuccess(customerName => customerName.Trim())
+                .Ensure(customerName => customerName != string.Empty, "Customer name should not be empty")
+                .Ensure(customerName => customerName.Length <= 200, "Customer name is too long")
+                .OnSuccess(customerName => new CustomerName(customerName));
         }
 
         public static explicit operator CustomerName(string customerName)

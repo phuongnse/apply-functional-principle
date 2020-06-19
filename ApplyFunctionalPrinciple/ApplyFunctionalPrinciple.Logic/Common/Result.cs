@@ -49,6 +49,19 @@ namespace ApplyFunctionalPrinciple.Logic.Common
 
             return Ok();
         }
+
+        public T OnBoth<T>(Func<Result, T> func)
+        {
+            return func(this);
+        }
+
+        public Result OnSuccess(Action action)
+        {
+            if (IsSuccess)
+                action();
+
+            return this;
+        }
     }
 
     public class Result<T> : Result
@@ -61,5 +74,26 @@ namespace ApplyFunctionalPrinciple.Logic.Common
         }
 
         public T Value => !IsSuccess ? throw new InvalidOperationException() : _value;
+
+        public Result<TK> OnSuccess<TK>(Func<T, TK> func)
+        {
+            return IsFailure ? Fail<TK>(Error) : Ok(func(_value));
+        }
+
+        public Result<T> OnSuccess(Action<T> action)
+        {
+            if (IsSuccess)
+                action(_value);
+
+            return this;
+        }
+
+        public Result<T> Ensure(Func<T, bool> predicate, string errorMessage)
+        {
+            if (IsFailure)
+                return this;
+
+            return !predicate(_value) ? Fail<T>(errorMessage) : this;
+        }
     }
 }

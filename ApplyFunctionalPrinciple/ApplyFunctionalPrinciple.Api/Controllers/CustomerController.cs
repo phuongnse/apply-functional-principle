@@ -45,22 +45,16 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}")]
         public IActionResult Update(UpdateCustomerModel model)
         {
-            var maybeCustomer = _customerRepository.GetById(model.Id);
-
-            if (maybeCustomer.HasNoValue)
-                return Error("Customer with such Id is not found: " + model.Id);
+            var customerResult = _customerRepository
+                .GetById(model.Id)
+                .ToResult("Customer with such Id is not found: " + model.Id);
 
             var industryResult = Industry.Get(model.Industry);
 
-            if (industryResult.IsFailure)
-                return Error(industryResult.Error);
-
-            var customer = maybeCustomer.Value;
-            var industry = industryResult.Value;
-
-            customer.UpdateIndustry(industry);
-
-            return Ok();
+            return Result
+                .Combine(customerResult, industryResult)
+                .OnSuccess(() => customerResult.Value.UpdateIndustry(industryResult.Value))
+                .OnBoth(result => result.IsFailure ? Error(result.Error) : Ok());
         }
 
         [HttpDelete]
@@ -108,22 +102,13 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
         [Route("customers/{id}/promotion")]
         public IActionResult Promote(long id)
         {
-            var maybeCustomer = _customerRepository.GetById(id);
-
-            if (maybeCustomer.HasNoValue)
-                return Error("Customer with such Id is not found: " + id);
-
-            var customer = maybeCustomer.Value;
-
-            if (!customer.CanBePromoted())
-                return Error("The customer has the highest status possible");
-
-            customer.Promote();
-
-            var sendPromotionNotificationResult =
-                _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status);
-
-            return sendPromotionNotificationResult.IsFailure ? Error(sendPromotionNotificationResult.Error) : Ok();
+            return _customerRepository
+                .GetById(id)
+                .ToResult("Customer with such Id is not found: " + id)
+                .Ensure(customer => customer.CanBePromoted(), "The customer has the highest status possible")
+                .OnSuccess(customer => customer.Promote())
+                .OnSuccess(customer => _emailGateway.SendPromotionNotification(customer.PrimaryEmail, customer.Status))
+                .OnBoth(result => result.IsFailure ? Error(result.Error) : Ok());
         }
 
         private static Result<Maybe<Email>> GetSecondaryEmail(string secondaryEmail)
@@ -131,11 +116,9 @@ namespace ApplyFunctionalPrinciple.Api.Controllers
             if (secondaryEmail == null)
                 return Result.Ok<Maybe<Email>>(null);
 
-            var emailResult = Email.Create(secondaryEmail);
-
-            return emailResult.IsFailure
-                ? Result.Fail<Maybe<Email>>(emailResult.Error)
-                : Result.Ok<Maybe<Email>>(emailResult.Value);
+            return Email
+                .Create(secondaryEmail)
+                .OnSuccess(email => (Maybe<Email>) email);
         }
     }
 }
